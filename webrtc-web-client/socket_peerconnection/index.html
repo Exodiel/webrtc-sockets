@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="description" content="WebRTC code samples">
@@ -12,32 +13,36 @@
   <title>Realtime communication with WebRTC</title>
   <script src="lib/socket.io.js"></script>
 
-  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/main.css" />
 </head>
 
 <body>
-<div id="container">
+  <div id="container">
 
-  <img src="logo.svg" width="100"/>
-  <h1>WebRTC</h1>
-  <p id="peerConnectionStatus"></p>
+    <img src="logo.svg" width="100" />
+    <h1>WebRTC</h1>
+    <p id="peerConnectionStatus"></p>
 
-  <video id="localVideo" playsinline autoplay muted></video>
-  <video id="remoteVideo" playsinline autoplay></video>
+    <video id="localVideo" playsinline autoplay muted></video>
+    <video id="remoteVideo" playsinline autoplay></video>
 
-  <div class="box">
-    <p id="clientId"></p>
-  </div>
-
-  <div class="box">
-    <div style="display: inline;">
-      <input type="text" id="calleeIdInput" placeholder="Callee Id">
-      <button id="callButton">Call</button>
+    <div class="box">
+      <p id="clientId"></p>
     </div>
-    <button id="hangupButton">Hang Up</button>
-  </div>
 
-</div>
+    <div class="box">
+      <div style="display: inline;">
+        <input type="text" id="calleeIdInput" placeholder="Callee Id">
+        <button id="callButton">Call</button>
+      </div>
+      <div id="boxAnswerDecline" style="display: none;">
+        <button id="answerButton" style="background-color: green; color: white; font-weight: bold;">Answer</button>
+        <button id="declineButton" style="background-color: red; color: white; font-weight: bold;">Decline</button>
+      </div>
+      <button id="hangupButton">Hang Up</button>
+    </div>
+
+  </div>
 </body>
 
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>

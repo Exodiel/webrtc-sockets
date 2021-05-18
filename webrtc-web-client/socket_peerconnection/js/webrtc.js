@@ -29,6 +29,9 @@ const clientIdP = document.getElementById('clientId');
 const peerConnectionStatusP = document.getElementById('peerConnectionStatus');
 const calleeIdInput = document.getElementById('calleeIdInput');
 const callButton = document.getElementById('callButton');
+const answerButton = document.getElementById('answerButton');
+const declineButton = document.getElementById('declineButton');
+const boxAnswerDecline = document.getElementById('boxAnswerDecline');
 const hangupButton = document.getElementById('hangupButton');
 const localVideo = document.getElementById('localVideo');
 const remoteVideo = document.getElementById('remoteVideo');
@@ -93,36 +96,57 @@ socket.on('connect', function () {
 
         // Set remote offer
         console.log('setRemoteDescription start');
-        try {
-            await peerConnection.setRemoteDescription(description);
-            console.log(`setRemoteDescription complete`);
-        } catch (e) {
-            onSetSessionDescriptionError(e);
-        }
+        boxAnswerDecline.style.display = "inline-block";
 
-        console.log(currentClientId + ' createAnswer start');
-        // Since the 'remote' side has no media stream we need
-        // to pass in the right constraints in order for it to
-        // accept the incoming offer of audio and video.
-        try {
-            const answer = await peerConnection.createAnswer();
-            await onCreateAnswerSuccess(answer);
-            // @nhancv 3/30/20: Send answer to callee
-            emitAnswerEvent(answer);
-        } catch (e) {
-            onCreateSessionDescriptionError(e);
-        }
+        answerButton.addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            console.log("answer")
+
+            boxAnswerDecline.style.display = "none";
+
+            try {
+                await peerConnection.setRemoteDescription(description);
+                console.log(`setRemoteDescription complete`);
+            } catch (e) {
+                onSetSessionDescriptionError(e);
+            }
+
+            console.log(currentClientId + ' createAnswer start');
+            // Since the 'remote' side has no media stream we need
+            // to pass in the right constraints in order for it to
+            // accept the incoming offer of audio and video.
+            try {
+                const answer = await peerConnection.createAnswer();
+                await onCreateAnswerSuccess(answer);
+                // @nhancv 3/30/20: Send answer to callee
+                emitAnswerEvent(answer);
+            } catch (e) {
+                onCreateSessionDescriptionError(e);
+            }
+        });
+
+        declineButton.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            boxAnswerDecline.style.display = "none";
+
+        });
+
     });
 
     socket.on(ANSWER_EVENT, async (description) => {
         console.log(ANSWER_EVENT, description);
         console.log('setRemoteDescription start');
+
         try {
             await peerConnection.setRemoteDescription(description);
             console.log(`setRemoteDescription complete`);
         } catch (e) {
             onSetSessionDescriptionError(e);
         }
+
+
     });
 
     socket.on(ICE_CANDIDATE_EVENT, async (candidate) => {
@@ -147,19 +171,19 @@ socket.on('connect', function () {
 ///////////////////////////////////////////////////
 function emitOfferEvent(peerId, description) {
     if (socket && socket.connected) {
-        socket.emit(OFFER_EVENT, {peerId: peerId, description: description})
+        socket.emit(OFFER_EVENT, { peerId: peerId, description: description })
     }
 }
 
 function emitAnswerEvent(description) {
     if (socket && socket.connected) {
-        socket.emit(ANSWER_EVENT, {description: description})
+        socket.emit(ANSWER_EVENT, { description: description })
     }
 }
 
 function emitIceCandidateEvent(isHost, candidate) {
     if (socket && socket.connected) {
-        socket.emit(ICE_CANDIDATE_EVENT, {isHost: isHost, candidate: candidate})
+        socket.emit(ICE_CANDIDATE_EVENT, { isHost: isHost, candidate: candidate })
     }
 }
 
@@ -213,7 +237,7 @@ async function loadLocalMedia() {
         }
 
         // const constraints = { audio: true, video: true };
-        const constraints = {audio: true, video: {facingMode: "user"}};
+        const constraints = { audio: true, video: { facingMode: "user" } };
         // const constraints = {audio: true, video: {facingMode: {exact: "environment"}}};
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         console.log('Received local stream');
